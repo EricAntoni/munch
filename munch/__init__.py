@@ -244,6 +244,27 @@ class AutoMunch(Munch):
 
         super(AutoMunch, self).__setattr__(k, v)
 
+    def __getattr__(self, k):
+        """ Automatically create a munchified dictionnary on non existing property access
+            to avoid AttributeError in chained call
+        """
+        try:
+            return super(AutoMunch, self).__getattr__(k)
+        except AttributeError:
+            super(AutoMunch, self).__setattr__(k, AutoMunch())
+            return super(AutoMunch, self).__getattr__(k)
+
+    def __getitem__(self, k):
+        """ Automatically create a munchified dictionnary on non existing element access
+            to avoid KeyError in chained call
+        """
+        try:
+            return super().__getitem__(k)
+        except KeyError:
+            self[k] = AutoMunch()
+            return super().__getitem__(k)
+
+
 
 class DefaultMunch(Munch):
     """
